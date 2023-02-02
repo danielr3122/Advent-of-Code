@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class day4 {
 
-    private static int findEngulfed(String section){
+    private static int[] findValues(String section){
         int start1, start2, end1, end2;
         String s1, s2, e1, e2;
         s1 = s2 = e1 = e2 = "";
@@ -26,8 +26,21 @@ public class day4 {
         end1 = Integer.parseInt(e1);
         start2 = Integer.parseInt(s2);
         end2 = Integer.parseInt(e2);
+        int arr[] = {start1, end1, start2, end2};
+        return arr;
+    }
 
+    private static int findEngulfed(int start1, int end1, int start2, int end2){
         if((start1 >= start2 && end1 <= end2) || (start2 >= start1 && end2 <= end1)){
+            return 1;
+        }
+        return 0;
+    }
+
+    private static int findOverlapped(int start1, int end1, int start2, int end2){
+        if(start1 == end2 || start2 == end1 || start1 == start2 || end1 == end2 ||
+        ((start1 > start2 || end1 > end2) && start1 < end2) ||
+        ((end2 > end1 || start2 > start1) && start2 < end1)){
             return 1;
         }
         return 0;
@@ -38,14 +51,13 @@ public class day4 {
         Scanner s = new Scanner(file);
         String section;
         int engulfedCount = 0;
+        int overlappedCount = 0;
         
         while(s.hasNextLine()){
             section = s.nextLine();
-            if(findEngulfed(section) == 1){
-                System.out.println(section);
-            }
-            engulfedCount += findEngulfed(section);
+            int[] arr = findValues(section);
+            overlappedCount += findOverlapped(arr[0], arr[1], arr[2], arr[3]);
         }
-        System.out.println(engulfedCount);
+        System.out.println(overlappedCount);
     }
 }
