@@ -82,6 +82,7 @@ public class day2 {
             String currRound = "" + round.charAt(0) + " " + myChoice;
             totalScore += score(currRound); // For part A, change score(currRound) to score(round)
         }
+        s.close();
         System.out.println(totalScore);
     }
 }
