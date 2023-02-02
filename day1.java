@@ -9,6 +9,7 @@ public class day1{
         int calories = 0;
         int maxCalories = 0;
         String value;
+        
         while(s.hasNextLine()){
             value = s.nextLine();
             if(value != ""){
