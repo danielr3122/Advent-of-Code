@@ -1,6 +1,3 @@
-// Advent of Code
-// Day 1, 2022
-
 import java.util.Scanner;
 import java.io.File;
 import java.io.FileNotFoundException;
