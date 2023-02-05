@@ -6,7 +6,21 @@ import java.util.ArrayList;
 
 public class day5{
 
-    private static String[] parseInput(String currRow){
+    private static ArrayList<String> getInitialPiles(Scanner setupScanner){
+        String setupString;
+        ArrayList<String> setupArr = new ArrayList<>();
+        while(setupScanner.hasNextLine()){
+            setupString = setupScanner.nextLine();
+            setupArr.add(setupString);
+            if(setupString.charAt(1) == '1'){
+                setupArr.remove(setupArr.size() - 1);
+                return setupArr;
+            }
+        }
+        return setupArr;
+    }
+
+    private static String[] parseSetup(String currRow){
         String[] returnArr = new String[currRow.length()];
         int index = 0;
         for(int i = 1; i < currRow.length(); i+=4){
@@ -28,7 +42,7 @@ public class day5{
         // Load boxes upside down
         String[] rowOfBoxes = new String[numOfStacks];
         for(int i = 0; i < setupArr.size(); i++){
-            rowOfBoxes = parseInput(setupArr.get(i));
+            rowOfBoxes = parseSetup(setupArr.get(i));
             for(int j = 0; j < numOfStacks; j++){
                 reversedBoxStacks[j].push(rowOfBoxes[j]);
             }
@@ -60,85 +74,85 @@ public class day5{
         }
     }
 
+    private static Stack<String>[] partOneMovement(int numOfMoves, int stackOne, int stackTwo, Stack<String>[] boxStacks){
+        String popValue;
+        for(int i = 0; i < numOfMoves; i++){
+            if(!boxStacks[stackOne - 1].empty()){
+                popValue = boxStacks[stackOne - 1].peek();
+                System.out.println(popValue);
+                boxStacks[stackTwo - 1].push(boxStacks[stackOne - 1].pop());
+            }
+        }
+        return boxStacks;
+    }
+
+    private static Stack<String>[] partTwoMovement(int numOfMoves, int stackOne, int stackTwo, Stack<String>[] boxStacks){
+        Stack<String> movedBoxes = new Stack<String>();
+        for(int i = 0; i < numOfMoves; i++){
+            if(!boxStacks[stackOne - 1].empty()){
+                movedBoxes.push(boxStacks[stackOne - 1].pop());
+            }
+        }
+        while(!movedBoxes.empty()){
+            boxStacks[stackTwo - 1].push(movedBoxes.pop());
+        }
+        return boxStacks;
+    }
+
+    private static Stack<String>[] moveBoxes(String moveString, Stack<String>[] boxStacks){
+        String[] inputNum = {"", "", ""};
+        if(moveString != "" && moveString.charAt(0) == 'm'){
+            int index = 0;
+            boolean isPreviousANumber = false;
+            for(int i = 0; i < moveString.length(); i++){
+                char currChar = moveString.charAt(i);
+                if(Character.isDigit(currChar)){
+                    inputNum[index] += currChar + "";
+                    isPreviousANumber = true;
+                } else {
+                    if(isPreviousANumber){
+                        index++;
+                        isPreviousANumber = false;
+                    }
+                }
+            }
+            int numOfMoves = Integer.parseInt(inputNum[0]);
+            int stackOne = Integer.parseInt(inputNum[1]);
+            int stackTwo = Integer.parseInt(inputNum[2]);
+
+            // Part 1 Crate Rearrangement
+            // boxStacks = partOneMovement(numOfMoves, stackOne, stackTwo, boxStacks);
+
+            // Part 2 Crate Rearrangement
+            boxStacks = partTwoMovement(numOfMoves, stackOne, stackTwo, boxStacks);
+
+            inputNum[0] = inputNum[1] = inputNum[2] = "";
+            numOfMoves = stackOne = stackTwo = 0;
+        }
+        return boxStacks;
+    }
+
     public static void main(String[] args) throws FileNotFoundException{
         File file = new File("input5.txt");
+        
+        // Get initial crate setup
         Scanner setupScanner = new Scanner(file);
-        Scanner movesScanner = new Scanner(file);
-        String setupString;
-        int lineCount = 0;
         ArrayList<String> setupArr = new ArrayList<>();
+        setupArr = getInitialPiles(setupScanner);
 
-        while(setupScanner.hasNextLine()){
-            setupString = setupScanner.nextLine();
-            setupArr.add(setupString);
-            if(setupString.charAt(1) == '1'){
-                break;
-            } else {
-                lineCount++;
-            }
-        }
-
-        setupArr.remove(setupArr.size() - 1);
+        // Turn setupArr into an array of stacks
         Stack<String>[] boxStacks = boxSetup(setupArr);
-
+        Scanner movesScanner = new Scanner(file);
+        
+        Stack<String>[] newPile = new Stack[boxStacks.length];
         String moveString;
-        String sNumOfMoves, sStackOne, sStackTwo;
-        sNumOfMoves = sStackOne = sStackTwo = "";
-        int numOfMoves, stackOne, stackTwo;
-        numOfMoves = stackOne = stackTwo = 0;
         while(movesScanner.hasNextLine()){
             moveString = movesScanner.nextLine();
-            if(moveString != "" && moveString.charAt(0) == 'm'){
-                // move 3 from 4 to 6
-                int index = 0;
-                boolean isNumber = false;
-                for(int i = 0; i < moveString.length(); i++){
-                    char currChar = moveString.charAt(i);
-                    if(Character.isDigit(currChar)){
-                        if(index == 0){
-                            sNumOfMoves += currChar + "";
-                        } else if(index == 1){
-                            sStackOne += currChar + "";
-                        } else {
-                            sStackTwo += currChar + "";
-                        }
-                        isNumber = true;
-                    } else {
-                        if(isNumber){
-                            index++;
-                            isNumber = false;
-                        }
-                    }
-                }
-                numOfMoves = Integer.parseInt(sNumOfMoves);
-                stackOne = Integer.parseInt(sStackOne);
-                stackTwo = Integer.parseInt(sStackTwo);
-
-                // Part 1 Crate Rearrangement
-                // String popValue;
-                // for(int i = 0; i < numOfMoves; i++){
-                //     if(!boxStacks[stackOne - 1].empty()){
-                //         popValue = boxStacks[stackOne - 1].peek();
-                //         System.out.println(popValue);
-                //         boxStacks[stackTwo - 1].push(boxStacks[stackOne - 1].pop());
-                //     }
-                // }
-
-                // Part 2 Crate Rearrangement
-                Stack<String> movedBoxes = new Stack<String>();
-                for(int i = 0; i < numOfMoves; i++){
-                    if(!boxStacks[stackOne - 1].empty()){
-                        movedBoxes.push(boxStacks[stackOne - 1].pop());
-                    }
-                }
-                while(!movedBoxes.empty()){
-                    boxStacks[stackTwo - 1].push(movedBoxes.pop());
-                }
-
-                sNumOfMoves = sStackOne = sStackTwo = "";
-                numOfMoves = stackOne = stackTwo = 0;
-            }
+            newPile = moveBoxes(moveString, boxStacks);
         }
-        printStack(setupArr, boxStacks);
+
+        printStack(setupArr, newPile);
+        setupScanner.close();
+        movesScanner.close();
     }
 }
