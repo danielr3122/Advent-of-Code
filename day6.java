@@ -42,5 +42,4 @@ public class day6 {
 
         s.close();
     }
-
 }
